@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "951111890695",
+    "firebase_url": "https://kotlinmessenger-181b5.firebaseio.com",
+    "project_id": "kotlinmessenger-181b5",
+    "storage_bucket": "kotlinmessenger-181b5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:951111890695:android:7202182c7d2d0928",
+        "android_client_info": {
+          "package_name": "au.com.patricklabes.patricksmessenger"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "951111890695-nbm4q629m8fppdpokkmcgeomec5nld5a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5kll7S5d-ToTnNxqKWHZlC-bF8PdHLe8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
