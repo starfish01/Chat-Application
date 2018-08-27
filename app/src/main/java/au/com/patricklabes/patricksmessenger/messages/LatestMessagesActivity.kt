@@ -21,6 +21,8 @@ class LatestMessagesActivity : AppCompatActivity() {
         var currentUser: User? = null
     }
 
+    var TAG = "latestMessages"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_latest_messages)
@@ -35,11 +37,17 @@ class LatestMessagesActivity : AppCompatActivity() {
 
     private fun fetchCurrentUser(){
         val uid = FirebaseAuth.getInstance().uid
-        val ref = FirebaseDatabase.getInstance().getReference("/user/$uid")
+
+        Log.d(TAG,"user uid $uid")
+
+        val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
+
+
+
         ref.addListenerForSingleValueEvent(object: ValueEventListener{
             override fun onDataChange(p0: DataSnapshot) {
                 currentUser = p0.getValue(User::class.java)
-                Log.d("latestMessages","current user ${currentUser?.username}")
+                Log.d("latestMessages","current user ${currentUser}")
             }
 
             override fun onCancelled(p0: DatabaseError) {
