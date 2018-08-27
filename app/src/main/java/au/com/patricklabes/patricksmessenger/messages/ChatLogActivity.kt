@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import au.com.patricklabes.patricksmessenger.R
+import au.com.patricklabes.patricksmessenger.models.ChatMessage
 import au.com.patricklabes.patricksmessenger.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
@@ -20,25 +21,29 @@ import kotlinx.android.synthetic.main.chat_to_row.view.*
 class ChatLogActivity : AppCompatActivity() {
 
     companion object {
-        val TAG = "ChatLog"
+        val TAG = "ChatLogActivity1"
     }
+
+    val adapter = GroupAdapter<ViewHolder>()
+
+    var toUser: User? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat_log)
 
-        //val username = intent.getStringExtra(NewMessageActivity.User_Key)
+        recylerview_chatlog.adapter = adapter
 
-        val user = intent.getParcelableExtra<User>(NewMessageActivity.User_Key)
+        toUser = intent.getParcelableExtra<User>(NewMessageActivity.User_Key)
 
-        supportActionBar?.title = user.username
+        supportActionBar?.title = toUser?.username
 
         //setupDummyData()
 
         listenForMessages()
 
         button_send_chatlog.setOnClickListener {
-            Log.d("chatlogactivity","Chat log button pressed")
+            Log.d(TAG,"Chat log button pressed")
             preformSendMessage();
         }
 
@@ -48,12 +53,37 @@ class ChatLogActivity : AppCompatActivity() {
     private fun listenForMessages(){
         val ref = FirebaseDatabase.getInstance().getReference("/messages")
 
+
         ref.addChildEventListener(object: ChildEventListener{
             override fun onCancelled(p0: DatabaseError) {
             }
 
             override fun onChildAdded(p0: DataSnapshot, p1: String?) {
                 val chatMessage = p0.getValue(ChatMessage::class.java)
+
+                if(chatMessage != null) {
+
+                    //Log.d(TAG, chatMessage.text + "to ${chatMessage.toId} from ${chatMessage.fromId}")
+
+                    Log.d(TAG,  "FUCK ${chatMessage.fromId} to ${FirebaseAuth.getInstance().uid}")
+
+                    if(chatMessage.fromId == FirebaseAuth.getInstance().uid){
+
+                        Log.d(TAG,"THE TRUTH")
+
+//                        val currentUser = LatestMessagesActivity.currentUser ?: return
+//
+//                        Log.d(TAG,"from message user ${currentUser.username}")
+
+                        adapter.add(ChatFromItem(chatMessage.text))
+
+                    }else{
+                        adapter.add(ChatToItem(chatMessage.text))
+
+//                        adapter.add(ChatToItem(chatMessage.text, toUser!!))
+                    }
+
+                }
 
             }
 
@@ -68,9 +98,7 @@ class ChatLogActivity : AppCompatActivity() {
         })
     }
 
-    class ChatMessage(val id: String, val text: String, val fromId: String, val toId:String, val timestap:Long){
-        constructor() : this("","","","",-1)
-    }
+
 
 
     private fun preformSendMessage(){
@@ -96,15 +124,6 @@ class ChatLogActivity : AppCompatActivity() {
 
     }
 
-    fun setupDummyData(){
-        val adapter = GroupAdapter<ViewHolder>()
-
-        adapter.add(ChatFromItem("From message"))
-        adapter.add(ChatToItem("To message"))
-
-
-        recylerview_chatlog.adapter = adapter
-    }
 }
 
 class ChatToItem(val text: String) : Item<ViewHolder>() {
@@ -114,6 +133,11 @@ class ChatToItem(val text: String) : Item<ViewHolder>() {
 
     override fun bind(viewHolder: ViewHolder, position: Int) {
         viewHolder.itemView.textView_chat_log_to.text = text
+        //load image
+//        val uri = user.profileImageUrl
+//        val targetImageView = viewHolder.itemView.chatlog_image_to
+//
+//        Picasso.get().load(uri).into(targetImageView)
     }
 }
 
@@ -124,5 +148,10 @@ class ChatFromItem(val text: String) : Item<ViewHolder>() {
 
     override fun bind(viewHolder: ViewHolder, position: Int) {
         viewHolder.itemView.textView_chat_log_from.text = text
+
+//        val uri = user.profileImageUrl
+//        val targetImageView = viewHolder.itemView.chatlog_image_from
+//
+//        Picasso.get().load(uri).into(targetImageView)
     }
 }
