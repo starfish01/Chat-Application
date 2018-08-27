@@ -7,7 +7,7 @@
     android:layout_marginBottom="12dp">
 
     <TextView
-        android:id="@+id/textView_chat_log_from"
+        android:id="@+id/textView_chat_log_to"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
