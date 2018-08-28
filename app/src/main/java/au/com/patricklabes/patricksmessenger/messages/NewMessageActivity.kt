@@ -50,11 +50,15 @@ class NewMessageActivity : AppCompatActivity() {
                 val adapter = GroupAdapter<ViewHolder>()
 
                 p0.children.forEach {
-                    Log.d("newmessage", it.toString())
+                    Log.d("newmessage1", it.toString())
+
+                    val user1 : String = LatestMessagesActivity.currentUser!!.uid
+
+                    Log.d("newmessage1", (it.key == user1).toString())
 
                     val user = it.getValue(User::class.java)
 
-                    if (user != null) {
+                    if (user != null && (it.key != user1)) {
 
                         adapter.add(UserItem(user))
 

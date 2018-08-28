@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import au.com.patricklabes.patricksmessenger.R
+import au.com.patricklabes.patricksmessenger.R.id.button_send_chatlog
+import au.com.patricklabes.patricksmessenger.R.id.recylerview_chatlog
 import au.com.patricklabes.patricksmessenger.models.ChatMessage
 import au.com.patricklabes.patricksmessenger.models.User
 import com.google.firebase.auth.FirebaseAuth
@@ -11,6 +13,7 @@ import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
 import com.xwray.groupie.ViewHolder
@@ -63,24 +66,27 @@ class ChatLogActivity : AppCompatActivity() {
 
                 if(chatMessage != null) {
 
-                    //Log.d(TAG, chatMessage.text + "to ${chatMessage.toId} from ${chatMessage.fromId}")
+                    Log.d(TAG, chatMessage.text + "to ${chatMessage.toId} from ${chatMessage.fromId}")
 
-                    Log.d(TAG,  "FUCK ${chatMessage.fromId} to ${FirebaseAuth.getInstance().uid}")
+
 
                     if(chatMessage.fromId == FirebaseAuth.getInstance().uid){
 
-                        Log.d(TAG,"THE TRUTH")
 
-//                        val currentUser = LatestMessagesActivity.currentUser ?: return
-//
-//                        Log.d(TAG,"from message user ${currentUser.username}")
 
-                        adapter.add(ChatFromItem(chatMessage.text))
+                        val currentUser = LatestMessagesActivity.currentUser ?: return
 
-                    }else{
-                        adapter.add(ChatToItem(chatMessage.text))
+                        Log.d(TAG,"from message user ${currentUser.username}")
 
-//                        adapter.add(ChatToItem(chatMessage.text, toUser!!))
+                        adapter.add(ChatFromItem(chatMessage.text,currentUser))
+p1
+                    }else if(chatMessage.toId == toUser?.uid){
+
+                        // Continue here Log.d(TAG,"to id ${chatMessage.toId} and to User $ ")
+
+                        //adapter.add(ChatToItem(chatMessage.text))
+
+                        adapter.add(ChatToItem(chatMessage.text, toUser!!))
                     }
 
                 }
@@ -126,7 +132,7 @@ class ChatLogActivity : AppCompatActivity() {
 
 }
 
-class ChatToItem(val text: String) : Item<ViewHolder>() {
+class ChatToItem(val text: String, val user: User) : Item<ViewHolder>() {
     override fun getLayout(): Int {
         return R.layout.chat_to_row
     }
@@ -134,14 +140,14 @@ class ChatToItem(val text: String) : Item<ViewHolder>() {
     override fun bind(viewHolder: ViewHolder, position: Int) {
         viewHolder.itemView.textView_chat_log_to.text = text
         //load image
-//        val uri = user.profileImageUrl
-//        val targetImageView = viewHolder.itemView.chatlog_image_to
+        val uri = user.profileImageUrl
+        val targetImageView = viewHolder.itemView.chatlog_image_to
 //
-//        Picasso.get().load(uri).into(targetImageView)
+        Picasso.get().load(uri).into(targetImageView)
     }
 }
 
-class ChatFromItem(val text: String) : Item<ViewHolder>() {
+class ChatFromItem(val text: String, val user: User) : Item<ViewHolder>() {
     override fun getLayout(): Int {
         return R.layout.chat_from_row
     }
@@ -149,9 +155,9 @@ class ChatFromItem(val text: String) : Item<ViewHolder>() {
     override fun bind(viewHolder: ViewHolder, position: Int) {
         viewHolder.itemView.textView_chat_log_from.text = text
 
-//        val uri = user.profileImageUrl
-//        val targetImageView = viewHolder.itemView.chatlog_image_from
-//
-//        Picasso.get().load(uri).into(targetImageView)
+        val uri = user.profileImageUrl
+        val targetImageView = viewHolder.itemView.chatlog_image_from
+
+        Picasso.get().load(uri).into(targetImageView)
     }
 }
