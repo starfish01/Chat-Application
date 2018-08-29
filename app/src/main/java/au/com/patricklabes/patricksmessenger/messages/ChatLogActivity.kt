@@ -74,7 +74,7 @@ class ChatLogActivity : AppCompatActivity() {
                         val currentUser = LatestMessagesActivity.currentUser ?: return
 
                         adapter.add(ChatFromItem(chatMessage.text,currentUser))
-p1
+
                     }else {
 
                         adapter.add(ChatToItem(chatMessage.text, toUser!!))
@@ -129,10 +129,16 @@ p1
 
                 }
 
-        toReference.setValue(chatMessage)
-                .addOnSuccessListener {
-                    Log.d("chatlogactivity", "Successfully saved message ${reference.key}")
+                toReference.setValue(chatMessage)
+                    .addOnSuccessListener {
+                        Log.d("chatlogactivity", "Successfully saved message ${reference.key}")
                 }
+
+        val latestMessageRef = FirebaseDatabase.getInstance().getReference("/latest-messages/$fromId/$toId")
+        latestMessageRef.setValue(chatMessage)
+
+        val latestMessageToRef = FirebaseDatabase.getInstance().getReference("/latest-messages/$toId/$fromId")
+        latestMessageToRef.setValue(chatMessage)
 
     }
 
