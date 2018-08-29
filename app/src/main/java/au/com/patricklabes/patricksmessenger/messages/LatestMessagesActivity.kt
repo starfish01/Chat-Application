@@ -7,14 +7,17 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import au.com.patricklabes.patricksmessenger.R
+import au.com.patricklabes.patricksmessenger.models.ChatMessage
 import au.com.patricklabes.patricksmessenger.models.User
 import au.com.patricklabes.patricksmessenger.registrationAndLogin.LoginActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
 import com.xwray.groupie.ViewHolder
 import kotlinx.android.synthetic.main.activity_latest_messages.*
+import kotlinx.android.synthetic.main.latest_message_activity_rom.view.*
 
 class LatestMessagesActivity : AppCompatActivity() {
 
@@ -36,19 +39,56 @@ class LatestMessagesActivity : AppCompatActivity() {
 
         supportActionBar?.title = "Messages"
 
-        //setUpRows()
+        recyclerView_latest_messages.adapter = adapter
 
         listenForLatestMessages()
 
     }
 
-    class LatestMessageRow: Item<ViewHolder>(){
+    val  latestMessageMap = HashMap<String, ChatMessage>()
+
+    private fun refreshRecyclerViewMessages(){
+        adapter.clear()
+        
+        latestMessageMap.values.forEach{
+            adapter.add(LatestMessageRow(it))
+        }
+    }
+
+
+    class LatestMessageRow(val chatMessage: ChatMessage): Item<ViewHolder>(){
         override fun getLayout(): Int {
             return R.layout.latest_message_activity_rom
         }
 
         override fun bind(viewHolder: ViewHolder, position: Int) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+            val dbuser = chatMessage.toId
+
+            val ref: DatabaseReference = FirebaseDatabase.getInstance().getReference("/users/$dbuser")
+
+
+
+            ref.addListenerForSingleValueEvent(object : ValueEventListener{
+                override fun onDataChange(p0: DataSnapshot) {
+
+                    val user = p0.getValue(User::class.java)?:return
+
+                    viewHolder.itemView.title_name_textView_latest_activity_row.text = user.username
+                    viewHolder.itemView.lattest_message_textView_latest_activity_row.text = chatMessage.text
+
+                    Picasso.get().load(user.profileImageUrl).into(viewHolder.itemView.profile_image_latest_message_activity_row)
+
+                }
+
+                override fun onCancelled(p0: DatabaseError) {
+
+                }
+            })
+
+
+
+
         }
     }
 
@@ -57,37 +97,37 @@ class LatestMessagesActivity : AppCompatActivity() {
         val ref = FirebaseDatabase.getInstance().getReference("/latest-messages/$fromId")
         ref.addChildEventListener(object: ChildEventListener{
             override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                val chatMessage = p0.getValue(ChatMessage::class.java) ?: return
+                latestMessageMap[p0.key!!] = chatMessage
+                refreshRecyclerViewMessages()
+
             }
 
             override fun onChildAdded(p0: DataSnapshot, p1: String?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                val chatMessage = p0.getValue(ChatMessage::class.java) ?: return
+                latestMessageMap[p0.key!!] = chatMessage
+                refreshRecyclerViewMessages()
+
             }
 
             override fun onChildRemoved(p0: DataSnapshot) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
             }
 
             override fun onCancelled(p0: DatabaseError) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
             }
 
             override fun onChildMoved(p0: DataSnapshot, p1: String?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
             }
         })
     }
 
+    val adapter = GroupAdapter<ViewHolder>()
 
-    private fun setUpRows(){
 
-        val adapter = GroupAdapter<ViewHolder>()
 
-        adapter.add(LatestMessageRow())
-
-        recyclerView_latest_messages.adapter = adapter
-
-    }
 
     private fun fetchCurrentUser(){
         val uid = FirebaseAuth.getInstance().uid
@@ -146,3 +186,6 @@ class LatestMessagesActivity : AppCompatActivity() {
 
 
 }
+
+
+
