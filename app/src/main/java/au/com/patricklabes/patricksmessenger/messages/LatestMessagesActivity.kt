@@ -14,12 +14,9 @@ import au.com.patricklabes.patricksmessenger.models.User
 import au.com.patricklabes.patricksmessenger.registrationAndLogin.LoginActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
-import com.xwray.groupie.Item
 import com.xwray.groupie.ViewHolder
 import kotlinx.android.synthetic.main.activity_latest_messages.*
-import kotlinx.android.synthetic.main.latest_message_activity_rom.view.*
 
 class LatestMessagesActivity : AppCompatActivity() {
 
@@ -29,7 +26,6 @@ class LatestMessagesActivity : AppCompatActivity() {
 
     var TAG = "latestMessages"
 
-    var chatPartnerUser: User? = null
 
 
 
@@ -51,11 +47,12 @@ class LatestMessagesActivity : AppCompatActivity() {
             Log.d(TAG,"123")
             val intent = Intent(this,ChatLogActivity::class.java)
 
-            //val row = item as LatestMessageRow
-            //row.chatPartnerUser
+            val row = item as LatestMessageRow
 
-            //intent.putExtra(NewMessageActivity.User_Key, chatPartnerUser)
+            intent.putExtra(NewMessageActivity.User_Key, row.chatPartnerUser)
+
             startActivity(intent)
+
         }
 
 
@@ -119,12 +116,9 @@ class LatestMessagesActivity : AppCompatActivity() {
         Log.d(TAG,"user uid $uid")
 
         val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
-
-
-
         ref.addListenerForSingleValueEvent(object: ValueEventListener{
             override fun onDataChange(p0: DataSnapshot) {
-                chatPartnerUser = p0.getValue(User::class.java)
+                var chatPartnerUser = p0.getValue(User::class.java)
                 Log.d("latestMessages","current user ${currentUser}")
             }
 

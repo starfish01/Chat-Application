@@ -79,8 +79,9 @@ class ChatLogActivity : AppCompatActivity() {
 
                         adapter.add(ChatToItem(chatMessage.text, toUser!!))
                     }
-
                 }
+
+                recylerview_chatlog.scrollToPosition(adapter.itemCount -1)
 
             }
 
