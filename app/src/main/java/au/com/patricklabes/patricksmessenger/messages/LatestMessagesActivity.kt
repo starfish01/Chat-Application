@@ -3,11 +3,13 @@ package au.com.patricklabes.patricksmessenger.messages
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.DividerItemDecoration
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import au.com.patricklabes.patricksmessenger.R
 import au.com.patricklabes.patricksmessenger.models.ChatMessage
+import au.com.patricklabes.patricksmessenger.models.LatestMessageRow
 import au.com.patricklabes.patricksmessenger.models.User
 import au.com.patricklabes.patricksmessenger.registrationAndLogin.LoginActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -27,6 +29,8 @@ class LatestMessagesActivity : AppCompatActivity() {
 
     var TAG = "latestMessages"
 
+    var chatPartnerUser: User? = null
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,6 +44,20 @@ class LatestMessagesActivity : AppCompatActivity() {
         supportActionBar?.title = "Messages"
 
         recyclerView_latest_messages.adapter = adapter
+        recyclerView_latest_messages.addItemDecoration(DividerItemDecoration(this,DividerItemDecoration.VERTICAL))
+
+        //set onclick listener
+        adapter.setOnItemClickListener { item, view ->
+            Log.d(TAG,"123")
+            val intent = Intent(this,ChatLogActivity::class.java)
+
+            //val row = item as LatestMessageRow
+            //row.chatPartnerUser
+
+            //intent.putExtra(NewMessageActivity.User_Key, chatPartnerUser)
+            startActivity(intent)
+        }
+
 
         listenForLatestMessages()
 
@@ -56,41 +74,7 @@ class LatestMessagesActivity : AppCompatActivity() {
     }
 
 
-    class LatestMessageRow(val chatMessage: ChatMessage): Item<ViewHolder>(){
-        override fun getLayout(): Int {
-            return R.layout.latest_message_activity_rom
-        }
 
-        override fun bind(viewHolder: ViewHolder, position: Int) {
-
-            val dbuser = chatMessage.toId
-
-            val ref: DatabaseReference = FirebaseDatabase.getInstance().getReference("/users/$dbuser")
-
-
-
-            ref.addListenerForSingleValueEvent(object : ValueEventListener{
-                override fun onDataChange(p0: DataSnapshot) {
-
-                    val user = p0.getValue(User::class.java)?:return
-
-                    viewHolder.itemView.title_name_textView_latest_activity_row.text = user.username
-                    viewHolder.itemView.lattest_message_textView_latest_activity_row.text = chatMessage.text
-
-                    Picasso.get().load(user.profileImageUrl).into(viewHolder.itemView.profile_image_latest_message_activity_row)
-
-                }
-
-                override fun onCancelled(p0: DatabaseError) {
-
-                }
-            })
-
-
-
-
-        }
-    }
 
     private fun listenForLatestMessages(){
         val fromId = FirebaseAuth.getInstance().uid
@@ -140,7 +124,7 @@ class LatestMessagesActivity : AppCompatActivity() {
 
         ref.addListenerForSingleValueEvent(object: ValueEventListener{
             override fun onDataChange(p0: DataSnapshot) {
-                currentUser = p0.getValue(User::class.java)
+                chatPartnerUser = p0.getValue(User::class.java)
                 Log.d("latestMessages","current user ${currentUser}")
             }
 
